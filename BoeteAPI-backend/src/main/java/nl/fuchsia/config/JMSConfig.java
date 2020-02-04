@@ -35,25 +35,26 @@ public class JMSConfig {
 		return new ActiveMQTopic("cjib.mq.topic");
 	}
 
-	@Bean
-	public JmsTemplate jmsTemplate(ActiveMQConnectionFactory connectionFactory, ActiveMQTopic topic) {
-		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
-		jmsTemplate.setDefaultDestination(topic);
-		return jmsTemplate;
-	}
-
 //	@Bean
-//	public JmsTemplate jmsTemplate(ActiveMQConnectionFactory connectionFactory, ActiveMQQueue queue) {
+//	public JmsTemplate jmsTemplate(ActiveMQConnectionFactory connectionFactory, ActiveMQTopic topic) {
 //		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
-//		jmsTemplate.setDefaultDestination(queue);
+//		jmsTemplate.setDefaultDestination(topic);
 //		return jmsTemplate;
 //	}
+
+	@Bean
+	public JmsTemplate jmsTemplate(ActiveMQConnectionFactory connectionFactory, ActiveMQQueue queue) {
+		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
+		jmsTemplate.setDefaultDestination(queue);
+		return jmsTemplate;
+	}
 
 	@Bean
 	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(ConnectionFactory connectionFactory) {
 		DefaultJmsListenerContainerFactory jmsListenerContainerFactory = new DefaultJmsListenerContainerFactory();
 		jmsListenerContainerFactory.setConnectionFactory(connectionFactory);
-		jmsListenerContainerFactory.setPubSubDomain(true);
+		// true is TOPIC and false is QUEUE
+		jmsListenerContainerFactory.setPubSubDomain(false);
 		return jmsListenerContainerFactory;
 	}
 }

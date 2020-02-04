@@ -1,5 +1,9 @@
 package nl.fuchsia.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import nl.fuchsia.dto.PersoonJmsDto;
 import nl.fuchsia.exceptionhandlers.NotFoundException;
 import nl.fuchsia.exceptionhandlers.UniekVeldException;
 import nl.fuchsia.model.Persoon;
@@ -55,8 +59,18 @@ public class PersoonService {
 	 * @return
 	 */
     public Persoon getPersoonById(Integer persoonnr) {
-        Optional<Persoon> persoon = persoonRepository.findById(persoonnr);
-		jmsTemplate.send(session -> session.createTextMessage("Persoon met persoonnr : "+ persoonnr +" opgevraagd " + LocalDateTime.now()));
+		Optional<Persoon> persoon = persoonRepository.findById(persoonnr);
+    	try{
+			//jmsTemplate.send(session -> session.createTextMessage("Persoon met persoonnr : "+ persoonnr +" opgevraagd " + LocalDateTime.now()));
+			ObjectMapper mapper = new ObjectMapper();
+			PersoonJmsDto persoonJmsDto = new PersoonJmsDto();
+			persoonJmsDto.setVerzender("Rense");
+			persoonJmsDto.setBericht("Persoon opgevraagd");
+			String jsonMessage = mapper.writeValueAsString(persoonJmsDto);
+			jmsTemplate.send(session -> session.createTextMessage(jsonMessage));
+		}catch (JsonProcessingException e){
+			throw new UniekVeldException("Foute JSON");
+		}
 
         return persoon.orElseThrow(() -> new NotFoundException("PersoonNummer: " + persoonnr + " bestaat niet"));
     }
