@@ -161,7 +161,7 @@ public class ZaakService {
         }
 
         List<Integer> feitNrs = listZaakAddFeitDto.stream()
-                .map(ZaakAddFeitDto::getFeitnr)
+                .map(ZaakAddFeitDto::getFeitNr)
                 .collect(Collectors.toList());
 
         List<Feit> foundFeiten = feitNrs.parallelStream()
